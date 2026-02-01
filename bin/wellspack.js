@@ -22,7 +22,7 @@ const commands = {
 async function main() {
   if (!command || !commands[command]) {
     console.log(`
-Usage: wellspack <command>
+LOCAL -- Usage:: wellspack <command>
 
 Commands:
   init      Setup wizard for Trello/GitHub configuration

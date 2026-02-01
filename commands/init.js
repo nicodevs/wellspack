@@ -37,17 +37,12 @@ function addToGitignore(filename) {
 }
 
 async function promptTrelloCredentials() {
-  note(
-    [
-      '1. Go to https://trello.com/power-ups/admin',
-      '2. Create a new Power-Up (or use existing)',
-      '3. Generate an API key'
-    ].join(EOL),
-    'Get your Trello API key:'
-  )
+  log.info('Enter the Trello API key of your Power-Up.')
+  log.info('Or create one here:')
+  log.message('https://trello.com/power-ups/admin')
 
   const apiKey = handleCancel(await password({
-    message: 'Enter your Trello API key',
+    message: 'Enter your API key',
     validate: value => value?.length ? undefined : 'API key is required'
   }))
 
@@ -98,27 +93,42 @@ async function fetchLists(trello, boardId) {
   }
 }
 
+function findListByKeywords(lists, keywords) {
+  const normalize = str => str.toLowerCase().replace(/[^a-z]/g, '')
+  for (const keyword of keywords) {
+    const list = lists.find(l => normalize(l.name).includes(keyword))
+    if (list) return list.id
+  }
+}
+
 async function promptListSelection(lists) {
+  note('We\'ll fetch cards to tackle from this list.', 'To Do')
   const todoListId = handleCancel(await select({
     message: 'Select your "To Do" list',
-    options: lists.map(list => ({ value: list.id, label: list.name }))
+    options: lists.map(list => ({ value: list.id, label: list.name })),
+    initialValue: findListByKeywords(lists, ['todo', 'backlog'])
   }))
 
   const availableForDoing = lists.filter(list => list.id !== todoListId)
+  note('We\'ll move cards in progress to this list.', 'Doing')
   const doingListId = handleCancel(await select({
     message: 'Select your "Doing" list',
-    options: availableForDoing.map(list => ({ value: list.id, label: list.name }))
+    options: availableForDoing.map(list => ({ value: list.id, label: list.name })),
+    initialValue: findListByKeywords(availableForDoing, ['doing', 'inprogress', 'current'])
   }))
 
   const availableForReview = lists.filter(list => list.id !== todoListId && list.id !== doingListId)
+  note('Once a PR is ready for review, we\'ll move the card here.', 'Review')
   const reviewListId = handleCancel(await select({
     message: 'Select your "Review" list',
-    options: availableForReview.map(list => ({ value: list.id, label: list.name }))
+    options: availableForReview.map(list => ({ value: list.id, label: list.name })),
+    initialValue: findListByKeywords(availableForReview, ['review', 'testing', 'qa'])
   }))
 
   const availableForDone = lists.filter(list => list.id !== todoListId && list.id !== doingListId && list.id !== reviewListId)
+  note('We\'ll check the cards you already finished from these lists.', 'Done')
   const doneListIds = handleCancel(await multiselect({
-    message: 'Select all lists that hold closed tasks (e.g. "Done", "Deployed")',
+    message: 'Select your "Done" lists (Space to select, Enter to submit)',
     options: availableForDone.map(list => ({ value: list.id, label: list.name })),
     required: true
   }))
@@ -129,15 +139,13 @@ async function promptListSelection(lists) {
 
   note(
     [
-      'Your "End of Day" report will have two sections, DOING and DONE.',
-      '',
       'DOING will include cards assigned to you in the list:',
       `- ${doingListName}`,
       '',
       'DONE will include cards assigned to you with activity in the last 12 hs from the lists:',
       `- ${allDoneNames}`
     ].join(EOL),
-    'Thanks!'
+    'Perfect! Your "End of Day" report will have two sections, DOING and DONE.'
   )
 
   return {
@@ -199,7 +207,7 @@ async function promptMemberSelection(members) {
 async function promptDefaultReviewer() {
   return handleCancel(await text({
     message: 'Enter the GitHub username of the default reviewer',
-    placeholder: 'nicodevs',
+    placeholder: 'username',
     validate: value => {
       if (!value) return 'Default reviewer is required'
       if (!/^[a-zA-Z0-9-]+$/.test(value)) return 'Invalid GitHub username'
