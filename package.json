@@ -1,0 +1,51 @@
+{
+  "name": "wellspack",
+  "version": "0.1.0",
+  "description": "CLI tool integrating Trello and GitHub workflows",
+  "type": "module",
+  "bin": {
+    "wellspack": "bin/wellspack.js"
+  },
+  "files": [
+    "bin",
+    "commands",
+    "lib"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [
+    "trello",
+    "github",
+    "workflow",
+    "cli",
+    "pr",
+    "pull-request"
+  ],
+  "author": "Nico Devs <hi@nicodevs.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicodevs/wellspack"
+  },
+  "bugs": {
+    "url": "https://github.com/nicodevs/wellspack/issues"
+  },
+  "homepage": "https://github.com/nicodevs/wellspack#readme",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "execa": "^9.0.0",
+    "lodash": "^4.17.23",
+    "trello": "^0.11.0",
+    "zod": "^4.3.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.3.0"
+  }
+}

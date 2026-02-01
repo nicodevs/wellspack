@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(time gh pr comment:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr comment:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(node:*)",
+      "Bash(wc:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:fix:*)"
+    ]
+  }
+}
