@@ -99,3 +99,9 @@ npx wellspack@latest eod
 ## License
 
 MIT
+
+## Author
+
+Nico Devs
+
+[nicodevs.com](https://nicodevs.com)
