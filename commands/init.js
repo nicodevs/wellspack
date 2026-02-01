@@ -3,7 +3,8 @@ import { EOL } from 'os'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { handleCancel } from '../lib/prompts.js'
 import { loadConfig, saveConfig, getDefaultConfig } from '../lib/config.js'
-import { isGitRepository } from '../lib/git.js'
+import { isGitRepository, getDefaultBranch as getGitDefaultBranch } from '../lib/git.js'
+import { getDefaultBranch as getGitHubDefaultBranch } from '../lib/github.js'
 import { createTrelloClient, fetchMembersFromBoard, fetchListsFromBoard } from '../lib/trello.js'
 
 function getTokenUrl(apiKey) {
@@ -195,13 +196,13 @@ async function promptMemberSelection(members) {
     placeholder: defaultInitials || 'jd',
     defaultValue: defaultInitials,
     validate: value => {
-      if (!value) return 'Initials are required'
+      if (!value) return undefined
       if (!/^[a-zA-Z]{2}$/.test(value)) return 'Must be exactly 2 letters'
       return undefined
     }
   }))
 
-  return { memberId, initials: initials.toLowerCase() }
+  return { memberId, initials: (initials || defaultInitials).toLowerCase() }
 }
 
 async function promptDefaultReviewer() {
@@ -214,6 +215,16 @@ async function promptDefaultReviewer() {
       return undefined
     }
   }))
+}
+
+async function promptBaseBranch() {
+  const defaultBranch = await getGitHubDefaultBranch() || await getGitDefaultBranch() || 'main'
+  const value = handleCancel(await text({
+    message: 'Enter the target branch for pull requests',
+    placeholder: defaultBranch,
+    defaultValue: defaultBranch
+  }))
+  return value || defaultBranch
 }
 
 async function promptGitignore() {
@@ -259,6 +270,7 @@ export async function init() {
   const { memberId, initials } = await promptMemberSelection(members)
 
   const defaultReviewer = await promptDefaultReviewer()
+  const baseBranch = await promptBaseBranch()
 
   const existingConfig = loadConfig() || getDefaultConfig()
   const config = {
@@ -274,7 +286,8 @@ export async function init() {
     },
     github: {
       ...existingConfig.github,
-      defaultReviewer
+      defaultReviewer,
+      baseBranch
     }
   }
 
