@@ -1,16 +1,37 @@
 {
   "permissions": {
     "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
       "Bash(npm install:*)",
       "Bash(time gh pr comment:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr comment:*)",
       "Bash(gh pr edit:*)",
-      "Bash(node:*)",
-      "Bash(wc:*)",
       "Bash(gh pr diff:*)",
       "Bash(npm run lint)",
-      "Bash(npm run lint:fix:*)"
+      "Bash(npm run lint:fix:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(npx wellspack@0.1.0)",
+      "Bash(npm view:*)",
+      "Bash(npx wellspack)",
+      "Bash(npm unlink:*)",
+      "Bash(~/.zshrc)",
+      "Bash(tmutil listbackups:*)"
     ]
   }
 }
