@@ -1,30 +1,35 @@
 # Wellspack
 
-CLI tool integrating Trello and GitHub workflows. Manage cards, create branches, open PRs, and generate daily reports.
+CLI tool integrating Trello and GitHub. Manage cards, create branches, open PRs, and generate daily reports.
 
 ## Usage
 
 ```bash
-npx wellspack@latest <command>
+npx wellspack <command>
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `init` | Setup wizard for Trello/GitHub configuration |
-| `tackle` | Tackle a Trello card (create branch + PR) |
-| `status` | Show current card and PR status |
-| `done` | Mark current PR as ready for review |
-| `return` | Return a PR to draft status |
-| `eod` | Generate end-of-day report |
+| `init` | Guides you through configuring your Trello API credentials, board, lists, and account, as well as your GitHub default reviewer. Creates a `wellspack.config.json` file with your settings |
+| `tackle` | Lets you pick a "To Do" card assigned to you. Once picked, it creates a new branch and a draft PR for it, and moves the card to the "Doing" list |
+| `done` | Marks the current branch's PR as ready for review, assigns the configured default reviewer, and moves the linked Trello card to the "Review" list |
+| `return` | Takes a PR link as an argument, converts it back to draft status, finds the linked Trello card in the "Review" list, and moves it back to the "Doing" list |
+| `status` | Shows the current branch's linked Trello card details (title, list, link) and PR info (link, branch name) |
+| `eod` | Generates an end-of-day report with two sections: "DONE" lists cards with activity in the last 12 hours, "DOING" lists cards currently in the "Doing" list |
+
+## Requirements
+
+- Node.js >= 22
+- [GitHub CLI](https://cli.github.com/) (`gh`) installed and authenticated
 
 ## Setup
 
-Run the init command to configure your Trello and GitHub integration:
+Run the `init` command to configure your Trello and GitHub integration:
 
 ```bash
-npx wellspack@latest init
+npx wellspack init
 ```
 
 The setup wizard will guide you through:
@@ -37,7 +42,7 @@ The setup wizard will guide you through:
 This creates a `wellspack.config.json` file with your settings.
 
 > [!NOTE]
-> The config file contains API keys. Add it to `.gitignore` to keep credentials private.
+> The config file contains API keys. Add it to `.gitignore` to keep credentials private. The wizard will offer to do that automatically.
 
 ## Workflow
 
@@ -46,55 +51,77 @@ This creates a `wellspack.config.json` file with your settings.
 Pick a card from your "To Do" list to start working on it:
 
 ```bash
-npx wellspack@latest tackle
+npx wellspack tackle
 ```
 
 This will:
-- Move the card to "Doing"
-- Create a feature branch
-- Open a draft PR
 
-### 2. Check status
+- Move the card to the "Doing" list
+- Create a feature branch named after your initials and the slugified card title, for example `jd/some-cool-task`
+- Open a draft PR and print the link to it
 
-See the current card and PR info:
+### 2. Mark as done
 
-```bash
-npx wellspack@latest status
-```
-
-### 3. Mark as done
-
-When ready for review:
+When you are done with the task, run `done`:
 
 ```bash
-npx wellspack@latest done
+npx wellspack done
 ```
 
 This will:
-- Mark the PR as ready for review
-- Assign reviewers
-- Move the card to "Review"
 
-### 4. Return to draft
+- Promote the draft PR to "Ready for review"
+- Assign the default reviewer to it
+- Move the Trello card to the "Review" list
 
-If changes are needed:
+### 3. Return to draft
+
+If changes are needed, the reviewer can run `return` and pass the PR link as a parameter:
 
 ```bash
-npx wellspack@latest return https://github.com/owner/repo/pull/123
+npx wellspack return https://github.com/owner/repo/pull/123
+```
+
+This will:
+
+- Change the PR status to draft
+- Move the Trello card back to the "Doing" list
+
+### 4. Check status
+
+To see the current card and PR info, run `status`:
+
+```bash
+npx wellspack status
+```
+
+Example output:
+
+```
+Status
+
+Card
+- Link: https://trello.com/c/mq67XBt2/398-fix-login-error
+- Title: Fix login error
+- List: Doing
+
+Pull Request
+- Link: https://github.com/owner/repo/pull/359
+- Branch: nd/fix-login-error
 ```
 
 ### 5. End of day report
 
-Generate a summary of your day:
+Generate a summary of your day in Markdown format.
 
 ```bash
-npx wellspack@latest eod
+npx wellspack eod
 ```
 
-## Requirements
+The report will include:
 
-- Node.js >= 22
-- [GitHub CLI](https://cli.github.com/) (`gh`) installed and authenticated
+- A DOING section with cards currently in the "Doing" list.
+- A DONE section with cards currently in the "Done" lists that you have selected, limited to those with activity in the last 12 hours.
 
 ## License
 
