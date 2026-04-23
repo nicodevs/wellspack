@@ -12,8 +12,8 @@ function formatSection(title, cards) {
   return [title, '', ...(cards.length ? cards.map(formatCard) : ['None'])]
 }
 
-async function fetchDoneCards(trello, board, lists, memberId) {
-  const cards = await fetchCardsWithRecentActivity(trello, board, lists, 12)
+async function fetchDoneCards(trello, board, lists, memberId, hours) {
+  const cards = await fetchCardsWithRecentActivity(trello, board, lists, hours ?? 12)
   return filter(cards, c => c.idMembers?.includes(memberId))
 }
 
@@ -32,10 +32,10 @@ function formatReport(doneCards, inProgressCards) {
 export async function eod() {
   const config = loadValidatedConfig()
   const trello = createTrelloClient(config.trello.apiKey, config.trello.apiToken)
-  const { memberId, lists, board } = config.trello
+  const { memberId, lists, board, recentActivityHours } = config.trello
 
   const doneLists = [lists.review, ...lists.done]
-  const doneCards = await fetchDoneCards(trello, board, doneLists, memberId)
+  const doneCards = await fetchDoneCards(trello, board, doneLists, memberId, recentActivityHours)
   const inProgressCards = await fetchInProgressCards(trello, lists.doing, memberId)
 
   console.log(formatReport(doneCards, inProgressCards))
