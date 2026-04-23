@@ -28,6 +28,11 @@ jobs:
           npm version minor -m "v%s"
           git push --follow-tags
 
+      - name: Create GitHub release
+        run: gh release create "$(git describe --tags --abbrev=0)" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
